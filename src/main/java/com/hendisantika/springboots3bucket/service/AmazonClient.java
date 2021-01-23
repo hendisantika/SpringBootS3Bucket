@@ -1,8 +1,13 @@
 package com.hendisantika.springboots3bucket.service;
 
+import com.amazonaws.auth.AWSCredentials;
+import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3Client;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
+import javax.annotation.PostConstruct;
 
 /**
  * Created by IntelliJ IDEA.
@@ -29,4 +34,10 @@ public class AmazonClient {
 
     @Value("${amazonProperties.secretKey}")
     private String secretKey;
+
+    @PostConstruct
+    private void initializeAmazon() {
+        AWSCredentials credentials = new BasicAWSCredentials(this.accessKey, this.secretKey);
+        this.s3client = new AmazonS3Client(credentials);
+    }
 }
