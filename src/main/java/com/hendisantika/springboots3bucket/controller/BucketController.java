@@ -2,6 +2,7 @@ package com.hendisantika.springboots3bucket.controller;
 
 import com.hendisantika.springboots3bucket.service.AmazonClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -33,4 +34,8 @@ public class BucketController {
         return this.amazonClient.uploadFile(file);
     }
 
+    @DeleteMapping("/deleteFile")
+    public String deleteFile(@RequestPart(value = "url") String fileUrl) {
+        return this.amazonClient.deleteFileFromS3Bucket(fileUrl);
+    }
 }
