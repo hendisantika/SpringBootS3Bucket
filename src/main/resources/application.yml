@@ -1,5 +1,6 @@
 amazonProperties:
   endpointUrl: https://s3.us-east-2.amazonaws.com
-  accessKey: AKIAIDMKDEINLEV2KLFA
-  secretKey: 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
+  accessKey: AWS_ACCESS_KEY_ID
+  secretKey: AWS_SECRET_ACCESS_KEY
   bucketName: new-awesome-bucket-1
+  region: ap-southeast-1

@@ -1,20 +1,20 @@
 package com.hendisantika.springboots3bucket.service;
 
-import com.amazonaws.auth.AWSCredentials;
-import com.amazonaws.auth.BasicAWSCredentials;
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3Client;
-import com.amazonaws.services.s3.model.CannedAccessControlList;
-import com.amazonaws.services.s3.model.DeleteObjectRequest;
-import com.amazonaws.services.s3.model.PutObjectRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
-import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Date;
 
 /**
@@ -29,7 +29,9 @@ import java.util.Date;
 @Service
 public class AmazonClient {
 
-    private AmazonS3 s3client;
+    private static final Logger log = LoggerFactory.getLogger(AmazonClient.class);
+
+    private final S3Client s3client;
 
     @Value("${amazonProperties.endpointUrl}")
     private String endpointUrl;
@@ -41,13 +43,15 @@ public class AmazonClient {
     private String accessKey;
 
     @Value("${amazonProperties.secretKey}")
-    private String secretKey;
+    private String accessSecret;
 
-    @PostConstruct
-    private void initializeAmazon() {
-        AWSCredentials credentials = new BasicAWSCredentials(this.accessKey, this.secretKey);
-        this.s3client = new AmazonS3Client(credentials);
+    @Value("${amazonProperties.region}")
+    private String region;
+
+    public AmazonClient(S3Client s3client) {
+        this.s3client = s3client;
     }
+
 
     public String uploadFile(MultipartFile multipartFile) {
         String fileUrl = "";
@@ -76,13 +80,35 @@ public class AmazonClient {
     }
 
     private void uploadFileTos3bucket(String fileName, File file) {
-        s3client.putObject(new PutObjectRequest(bucketName, fileName, file)
-                .withCannedAcl(CannedAccessControlList.PublicRead));
+        PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+                .bucket(bucketName)
+                .key(fileName)
+                .build();
+        s3client.putObject(putObjectRequest, RequestBody.fromFile(file));
     }
 
     public String deleteFileFromS3Bucket(String fileUrl) {
         String fileName = fileUrl.substring(fileUrl.lastIndexOf("/") + 1);
-        s3client.deleteObject(new DeleteObjectRequest(bucketName, fileName));
+        DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder()
+                .bucket(bucketName)
+                .key(fileName)
+                .build();
+        s3client.deleteObject(deleteObjectRequest);
         return "Successfully deleted";
+    }
+
+    public String uploadFile(ByteArrayResource resource, String fileName) {
+        PutObjectRequest putObjectRequest =
+                PutObjectRequest.builder().bucket(bucketName).key(fileName).build();
+        try (InputStream inputStream = resource.getInputStream()) {
+            s3client.putObject(
+                    putObjectRequest,
+                    RequestBody.fromInputStream(
+                            inputStream, resource.contentLength()));
+            log.info("Upload File success: {}", fileName);
+        } catch (Exception e) {
+            log.error("Error while uploading to s3 file {} with {}", e, fileName);
+        }
+        return fileName;
     }
 }
