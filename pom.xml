@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.3.4</version>
+        <version>3.5.7</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.hendisantika</groupId>
@@ -25,16 +25,10 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
-        <!--        <dependency>-->
-        <!--            <groupId>com.amazonaws</groupId>-->
-        <!--            <artifactId>aws-java-sdk</artifactId>-->
-        <!--            <version>1.12.777</version>-->
-        <!--        </dependency>-->
-        <!-- https://mvnrepository.com/artifact/software.amazon.awssdk/s3 -->
         <dependency>
-            <groupId>software.amazon.awssdk</groupId>
-            <artifactId>s3</artifactId>
-            <version>2.28.27</version>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk</artifactId>
+            <version>1.12.793</version>
         </dependency>
         <!--        <dependency>-->
         <!--            <groupId>org.springframework.cloud</groupId>-->
